@@ -97,8 +97,7 @@ def tesseract_anim(t):
     
     # 4D rotation
     th = 2 * np.pi * t / 8
-    R2 = rotation_matrix_4d(2, 3, th) # rotating around z-w plane
-    R = R2
+    R = rotation_matrix_4d(2, 3, th) # rotating around z-w plane
     
     Srot = S @ R.T
     Srot_proj = []
@@ -108,7 +107,7 @@ def tesseract_anim(t):
         p0_3d = perspective_proj_4d_to_3d(seg[0], d=3)
         p1_3d = perspective_proj_4d_to_3d(seg[1], d=3)
         
-        # special viewpoint - can see shape as regular tesseract
+        # special viewpoint - look like regular tesseract shape
         theta3d_y = np.pi / 6
         R3d_y = rotation_matrix_3d_y(theta3d_y)
         theta3d_x = -np.pi / 10
