@@ -57,6 +57,7 @@ def plt_anim_proj(t):
     axs.axis('equal')
     axs.set_xlim([-2, 2])
     axs.set_ylim([-2, 2])
+    plt.axis('off')
 
     d = 4.0
     
