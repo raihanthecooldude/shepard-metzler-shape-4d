@@ -177,6 +177,7 @@ class TesseractOpenGL:
         c, s = np.cos(theta), np.sin(theta)
         return np.array([[1, 0, 0], [0, c, s], [0, -s, c]])
 
+    # get new projected vertices after rotation and dimensional transformation
     def get_projected_vertices(self, t):
         th = 2 * np.pi * t / 8
         R4d = self.rotation_matrix_4d(2, 3, th)
@@ -191,7 +192,7 @@ class TesseractOpenGL:
         return v3d
 
     # main draw function
-    def draw(self, save_video=False, filename="tesseract.mp4", duration=8, fps=30):
+    def draw(self, save_video=False, filename="tesseract.mp4", duration=10, fps=30):
         if not glfw.init():
             raise Exception("Could not initialize GLFW")
         win = glfw.create_window(800, 800, "4D Tesseract", None, None)
@@ -215,6 +216,7 @@ class TesseractOpenGL:
 
         set_perspective()
         t0 = time.time()
+
         if save_video:
             frames = []
             max_frames = int(duration * fps)
@@ -259,11 +261,11 @@ class TesseractOpenGL:
             glfw.poll_events()
         glfw.terminate()
 
-        # Save video
+        # save video
         if save_video:
             print(f"Saving {len(frames)} frames to {filename} ...")
             iio.imwrite(filename, frames, fps=fps)
-            print("Done.")
+            print("Done")
 
 
 if __name__ == "__main__":
