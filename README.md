@@ -34,10 +34,7 @@ conda create -n myenv python=3.13
 ```
 conda activate myenv
 ```
-insidde conda environment:
 ```
 conda install numpy matplotlib==3.9.2 joblib ipywidgets
 pip install moviepy==1.0.3 glfw pyopengl
 ```
-
-#### Any kind of contribution is welcome
