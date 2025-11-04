@@ -167,7 +167,10 @@ class TesseractOpenGL:
     #     factor = d / (d - w)
     #     return v[:3] * factor
 
-    # this function works similar to the previous one, but more unbiased since this zz is dependent on both w and z (not only w)
+    # this function works similar to the previous one
+    # but more unbiased since this zz is dependent on both w and z (not only w)
+    #
+    # unbiased projection function
     @staticmethod
     def perspective_proj_4d_to_3d_prime(v, d=3.0):
         w = v[3]
