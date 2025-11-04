@@ -162,4 +162,4 @@ name = "nonspecial_transparent_tesseracts.mp4"
 
 animation = VideoClip(lambda t: tesseract_anim(t), duration=duration)
 animation.ipython_display(fps=fps, loop=True, autoplay=True)
-# animation.write_videofile(name + ".mp4", fps=fps)
+# animation.write_videofile(name, fps=fps)

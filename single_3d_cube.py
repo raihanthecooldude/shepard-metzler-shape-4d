@@ -72,10 +72,10 @@ def plt_anim_proj(t):
 
 duration = 10
 fps = 15
-name = 'cube_perspective_anim'
+name = 'cube_3d.mp4'
 
 animation = VideoClip(lambda t: plt_anim_proj(t), duration=duration)
 
 animation.ipython_display(fps=fps, loop=True, autoplay=True)
 
-# animation.write_videofile(name + ".mp4", fps=fps)
+# animation.write_videofile(name, fps=fps)
