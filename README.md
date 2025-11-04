@@ -16,6 +16,7 @@ $ moviepy==1.0.3
 
 ## Folder Structure
 
+```
 src
 |
 |---> exp-setup: main experimental setup for generating images and code to conduct the experiment (additional: the main rotating 4D metzler shape)
@@ -23,3 +24,4 @@ src
 |---> opaque: rendering and projection code for different stages of opaque 4D tesseracts
 |
 |---> transparent: rendering and projection code for different stages of transparent 4D tesseracts
+```
