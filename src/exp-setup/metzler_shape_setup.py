@@ -228,8 +228,7 @@ class TesseractOpenGL:
         w = v[3]
         z = v[2]
         zz = w + z
-        factor = d / (d - zz)
-        new_v = np.array((v[0] * factor, v[1] * factor, zz))
+        new_v = np.array((v[0], v[1], zz))
         return new_v
 
     # rotation function
@@ -258,7 +257,9 @@ class TesseractOpenGL:
 
         v4d_rot = v4d_rot @ r1.T @ r2.T @ r3.T @ r4.T @ r5.T @ r6.T
 
-        v3d = np.array([self.perspective_proj_4d_to_3d(v, d=7.0) for v in v4d_rot])
+        v3d = np.array(
+            [self.perspective_proj_4d_to_3d_prime(v, d=7.0) for v in v4d_rot]
+        )
 
         return v3d
 
