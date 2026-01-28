@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import imageio.v3 as iio
 
 # importing from main setup file
-from metzler_shape_setup import (
+from metzler_shape_gui import (
     TesseractOpenGL,
     shape_generator,
     mirror_shape_generator,
@@ -14,8 +14,8 @@ from metzler_shape_setup import (
 
 
 SUBJECT_NAME = "raihan"
-TRIAL_TYPE = "practice"
-TRIAL_NUM = 1
+TRIAL_TYPE = "experiment-feedback"
+TRIAL_NUM = 10
 SAVE_DIR_IMG = f"exp_results/{SUBJECT_NAME}/{TRIAL_TYPE}/{TRIAL_NUM}/images"
 SAVE_DIR_CSV = f"exp_results/{SUBJECT_NAME}/{TRIAL_TYPE}/{TRIAL_NUM}/result"
 MIRROR_AXES = "x"
@@ -24,15 +24,17 @@ MIRROR_AXES = "x"
 PATHS_RANDOM = [
     "UFFFLLDDDOO",
     "UUULLLDDLLO",
-    "RRRUUURRRDD",
-    "OOORRRUURRR",
-    "RRRDDDRRRRU",
+    "RRRUUUBBBOO",
+    "OOORRRUUUFF",
+    "RRRDDDBBBBO",
     "LLLUUUOORRR",
-    "LLLLIIUUUUO",
+    "LLLLIIUUUUR",
     "DDDLLLUUOLL",
-    "LLDDDDDLLII",
-    "OOORRRRIIID",
+    "LLDDDDDFFII",
+    "OOORRRRBBBD",
 ]
+
+# PATHS_RANDOM = ["DRRRUUUBBBO"]
 
 PATHS = PATHS_RANDOM
 
@@ -143,17 +145,14 @@ def run_gui_experiment(n_trials: int):
             fig, ax = plt.subplots(1, 2, figsize=(10, 6))
             ax[0].imshow(imgL)
             ax[0].axis("off")
-            ax[0]
             ax[1].imshow(imgR)
             ax[1].axis("off")
-            ax[1]
             fig.suptitle(
                 "Press SPACE/BAR if MIRRORED   |   Press ENTER if SAME",
                 fontsize=12,
             )
 
             key_holder = {"key": None, "rt": None}
-
             t_start = time.perf_counter()
 
             def on_key(event):
@@ -180,6 +179,101 @@ def run_gui_experiment(n_trials: int):
                 response_time_ms = int(round(key_holder["rt"] * 1000))
             else:
                 response_time_ms = 0
+
+            feedback_text = "Correct" if is_correct else "Incorrect"
+            feedback_color = "green" if is_correct else "red"
+
+            # load the two images again for feedback
+            imgL_fb = iio.imread(left_png)
+            imgR_fb = iio.imread(right_png)
+
+            fig_fb, ax_fb = plt.subplots(1, 2, figsize=(10, 6))
+            ax_fb[0].imshow(imgL_fb)
+            ax_fb[1].imshow(imgR_fb)
+            ax_fb[0].axis("off")
+            ax_fb[1].axis("off")
+
+            # answer words
+            answer_word = "MIRRORED" if user_answer_is_mirror else "SAME"
+            correct_word = "MIRRORED" if is_mirrored else "SAME"
+
+            fig_fb.text(
+                0.15,
+                0.90,
+                "You answered:",
+                fontsize=16,
+                ha="left",
+                va="center",
+            )
+            fig_fb.text(
+                0.315,
+                0.90,
+                answer_word,
+                fontsize=20,
+                fontweight="bold",
+                ha="left",
+                va="center",
+            )
+
+            fig_fb.text(
+                0.55,
+                0.90,
+                "Correct answer:",
+                fontsize=16,
+                ha="left",
+                va="center",
+            )
+            fig_fb.text(
+                0.73,
+                0.90,
+                correct_word,
+                fontsize=20,
+                fontweight="bold",
+                ha="left",
+                va="center",
+            )
+
+            # main feedback text
+            feedback_artist = fig_fb.text(
+                0.5,
+                0.75,
+                feedback_text,
+                fontsize=40,
+                color=feedback_color,
+                fontweight="bold",
+                ha="center",
+                va="center",
+                alpha=0.0,
+            )
+
+            # instruction
+            fig_fb.text(
+                0.5,
+                0.16,
+                "Press ENTER to continue",
+                fontsize=14,
+                ha="center",
+                va="center",
+            )
+
+            def on_key_fb(event):
+                if event.key in ("enter", "return"):
+                    plt.close(fig_fb)
+
+            fig_fb.canvas.mpl_connect("key_press_event", on_key_fb)
+
+            plt.show(block=False)
+
+            for alpha in np.linspace(0.0, 1.0, 20):
+                if not plt.fignum_exists(fig_fb.number):
+                    break
+                feedback_artist.set_alpha(alpha)
+                fig_fb.canvas.draw_idle()
+                plt.pause(0.03)
+
+            # wait until user presses ENTER
+            while plt.fignum_exists(fig_fb.number):
+                plt.pause(0.05)
 
             writer.writerow(
                 {
