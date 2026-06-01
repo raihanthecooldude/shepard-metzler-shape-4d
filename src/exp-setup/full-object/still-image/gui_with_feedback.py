@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import imageio.v3 as iio
 
 # importing from main setup file
-from metzler_shape_gui import (
+from metzler_shape_setup import (
     TesseractOpenGL,
     shape_generator,
     mirror_shape_generator,
