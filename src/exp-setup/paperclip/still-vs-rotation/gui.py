@@ -153,15 +153,7 @@ def show_trial_and_capture(trial_data):
         left_line.set_data(lp[:, 0], lp[:, 1])
         right_line.set_data(rp[:, 0], rp[:, 1])
 
-        # left_line.set_data(left_frames[idx])
-        # right_line.set_data(right_frames[idx])
         return [left_line, right_line]
-
-    def on_draw_start(event):
-        if key_holder["t_start"] is None:
-            key_holder["t_start"] = time.perf_counter()
-
-    fig.canvas.mpl_connect("draw_event", on_draw_start)
 
     anim = FuncAnimation(
         fig,
