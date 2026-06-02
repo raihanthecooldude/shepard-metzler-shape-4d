@@ -14,11 +14,22 @@ from metzler_shape_setup import (
     t_to_deg_int,
 )
 
-SUBJECT_NAME = "stephane-raihan"
-TRIAL_TYPE = "experiment-still-vs-paperclip"
-TRIAL_NUM = 20
-SAVE_DIR_CSV = f"exp-results/{SUBJECT_NAME}/{TRIAL_TYPE}/{TRIAL_NUM}/result"
-MIRROR_AXES = "x"
+# experiment config
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+from exp_config import (  # noqa: E402
+    SUBJECT_NAME,
+    EXP_TYPE,
+    TRIAL_TYPE,
+    TRIAL_NUM,
+    SAVE_DIR_IMG,
+    SAVE_DIR_CSV,
+    MIRROR_AXES,
+)
+
+CSV_PATH = os.path.join(
+    SAVE_DIR_CSV, f"{SUBJECT_NAME}_{EXP_TYPE}_{TRIAL_TYPE}_{TRIAL_NUM}.csv"
+)
 
 PATHS_RANDOM = [
     "UFFFLLDDDOO",
@@ -256,8 +267,7 @@ def show_feedback(trial_data, user_answer_is_mirror, is_correct):
 
 def run_gui_experiment(n_trials: int):
     os.makedirs(SAVE_DIR_CSV, exist_ok=True)
-    csv_path = os.path.join(
-        SAVE_DIR_CSV, f"{SUBJECT_NAME}_{TRIAL_TYPE}_{TRIAL_NUM}.csv")
+    csv_path = CSV_PATH
 
     fields = [
         "trial",

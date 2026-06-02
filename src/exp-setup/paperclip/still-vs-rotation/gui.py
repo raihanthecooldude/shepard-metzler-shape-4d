@@ -14,11 +14,22 @@ from metzler_shape_setup import (
     t_to_deg_int,
 )
 
-SUBJECT_NAME = "stephane-raihan"
-TRIAL_TYPE = "experiment-still-vs-paperclip"
-TRIAL_NUM = 20
-SAVE_DIR_CSV = f"exp-results/{SUBJECT_NAME}/{TRIAL_TYPE}/{TRIAL_NUM}/result"
-MIRROR_AXES = "x"
+# experiment config
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+from exp_config import (  # noqa: E402
+    SUBJECT_NAME,
+    EXP_TYPE,
+    TRIAL_TYPE,
+    TRIAL_NUM,
+    SAVE_DIR_IMG,
+    SAVE_DIR_CSV,
+    MIRROR_AXES,
+)
+
+CSV_PATH = os.path.join(
+    SAVE_DIR_CSV, f"{SUBJECT_NAME}_{EXP_TYPE}_{TRIAL_TYPE}_{TRIAL_NUM}.csv"
+)
 
 PATHS_RANDOM = [
     "UFFFLLDDDOO",
@@ -78,8 +89,10 @@ def prepare_trial(trial_idx):
     right_centers = S_m if is_mirrored else S
 
     proj = TesseractOpenGL()
-    left_frames = [proj.get_projected_centers_2d(S, t, d=10.0) for t in left_ts]
-    right_frames = [proj.get_projected_centers_2d(right_centers, t, d=10.0) for t in right_ts]
+    left_frames = [proj.get_projected_centers_2d(
+        S, t, d=10.0) for t in left_ts]
+    right_frames = [proj.get_projected_centers_2d(
+        right_centers, t, d=10.0) for t in right_ts]
 
     return {
         "trial": trial_idx,
@@ -181,8 +194,7 @@ def show_trial_and_capture(trial_data):
 
 def run_gui_experiment(n_trials: int):
     os.makedirs(SAVE_DIR_CSV, exist_ok=True)
-    csv_path = os.path.join(
-        SAVE_DIR_CSV, f"{SUBJECT_NAME}_{TRIAL_TYPE}_{TRIAL_NUM}.csv")
+    csv_path = CSV_PATH
 
     fields = [
         "trial",

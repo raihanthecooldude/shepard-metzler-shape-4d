@@ -13,11 +13,22 @@ from metzler_shape_setup import (
     t_to_deg_int,
 )
 
-SUBJECT_NAME = "raihan"
-TRIAL_TYPE = "paperclip"
-TRIAL_NUM = 10
-SAVE_DIR_CSV = f"exp-results/{SUBJECT_NAME}/{TRIAL_TYPE}/{TRIAL_NUM}/result"
-MIRROR_AXES = "x"
+# experiment config
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+from exp_config import (  # noqa: E402
+    SUBJECT_NAME,
+    EXP_TYPE,
+    TRIAL_TYPE,
+    TRIAL_NUM,
+    SAVE_DIR_IMG,
+    SAVE_DIR_CSV,
+    MIRROR_AXES,
+)
+
+CSV_PATH = os.path.join(
+    SAVE_DIR_CSV, f"{SUBJECT_NAME}_{EXP_TYPE}_{TRIAL_TYPE}_{TRIAL_NUM}.csv"
+)
 
 # PATHS_RANDOM = [
 #     "UFFFLLDDDOO",
@@ -254,10 +265,14 @@ def show_instant_feedback(trial_data, user_answer_is_mirror, is_correct):
     feedback_text = "Correct" if is_correct else "Incorrect"
     feedback_color = "green" if is_correct else "red"
 
-    fig_fb.text(0.15, 0.90, "You answered:", fontsize=16, ha="left", va="center")
-    fig_fb.text(0.315, 0.90, answer_word, fontsize=20, fontweight="bold", ha="left", va="center")
-    fig_fb.text(0.55, 0.90, "Correct answer:", fontsize=16, ha="left", va="center")
-    fig_fb.text(0.73, 0.90, correct_word, fontsize=20, fontweight="bold", ha="left", va="center")
+    fig_fb.text(0.15, 0.90, "You answered:",
+                fontsize=16, ha="left", va="center")
+    fig_fb.text(0.315, 0.90, answer_word, fontsize=20,
+                fontweight="bold", ha="left", va="center")
+    fig_fb.text(0.55, 0.90, "Correct answer:",
+                fontsize=16, ha="left", va="center")
+    fig_fb.text(0.73, 0.90, correct_word, fontsize=20,
+                fontweight="bold", ha="left", va="center")
 
     feedback_artist = fig_fb.text(
         0.5, 0.75, feedback_text,
@@ -265,7 +280,8 @@ def show_instant_feedback(trial_data, user_answer_is_mirror, is_correct):
         ha="center", va="center", alpha=0.0,
     )
 
-    fig_fb.text(0.5, 0.16, "Press ENTER to continue", fontsize=14, ha="center", va="center")
+    fig_fb.text(0.5, 0.16, "Press ENTER to continue",
+                fontsize=14, ha="center", va="center")
 
     def on_key_fb(event):
         if event.key in ("enter", "return"):
@@ -288,8 +304,7 @@ def show_instant_feedback(trial_data, user_answer_is_mirror, is_correct):
 
 def run_gui_experiment(n_trials: int):
     os.makedirs(SAVE_DIR_CSV, exist_ok=True)
-    csv_path = os.path.join(
-        SAVE_DIR_CSV, f"{SUBJECT_NAME}_{TRIAL_TYPE}_{TRIAL_NUM}.csv")
+    csv_path = CSV_PATH
 
     fields = [
         "trial",
