@@ -28,27 +28,12 @@ from exp_config import (  # noqa: E402
     SAVE_DIR_IMG,
     SAVE_DIR_CSV,
     MIRROR_AXES,
+    PATHS_RANDOM,
 )
 
 CSV_PATH = os.path.join(
     SAVE_DIR_CSV, f"{SUBJECT_NAME}_{EXP_TYPE}_{TRIAL_TYPE}_{TRIAL_NUM}.csv"
 )
-
-# paths to generate shape (randomized)
-PATHS_RANDOM = [
-    "UFFFLLDDDOO",
-    "UUULLLDDLLO",
-    "RRRUUUBBBOO",
-    "OOORRRUUUFF",
-    "RRRDDDBBBBO",
-    "LLLUUUOORRR",
-    "LLLLIIUUUUR",
-    "DDDLLLUUOLL",
-    "LLDDDDDFFII",
-    "OOORRRRBBBD",
-]
-
-# PATHS_RANDOM = ["DRRRUUUBBBO"]
 
 PATHS = PATHS_RANDOM
 
