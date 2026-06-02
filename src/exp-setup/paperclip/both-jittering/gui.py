@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 from metzler_shape_setup import (
+    TesseractOpenGL,
     shape_generator,
     mirror_shape_generator,
     t_to_deg_int,
@@ -44,47 +45,6 @@ ROTATE_N_FRAMES = 30
 ROTATE_INTERVAL_MS = 33
 
 
-def rotation_matrix_4d(i, j, theta):
-    R = np.eye(4)
-    c, s = np.cos(theta), np.sin(theta)
-    R[[i, i, j, j], [i, j, i, j]] = [c, -s, s, c]
-    return R
-
-
-def perspective_proj_4d_to_2d(v, d=3.0):
-    x, y, z, w = v[0], v[1], v[2], v[3]
-
-    # 4D to 3D
-    factor1 = d / (d - w)
-    x3 = x * factor1
-    y3 = y * factor1
-    z3 = z * factor1
-
-    # 3D to 2D
-    factor2 = d / (d - z3)
-    x2 = x3 * factor2
-    y2 = y3 * factor2
-
-    return np.array([x2, y2])
-
-
-def get_projected_centers_2d(centers_4d, t, d=10.0):
-    th = 2 * np.pi * t / 16
-    R4d = rotation_matrix_4d(0, 2, th)
-
-    theta = np.pi / 6
-    r1 = rotation_matrix_4d(0, 1, 0.0)
-    r2 = rotation_matrix_4d(0, 2, theta)
-    r3 = rotation_matrix_4d(0, 3, theta)
-    r4 = rotation_matrix_4d(1, 2, theta)
-    r5 = rotation_matrix_4d(1, 3, 0.0)
-    r6 = rotation_matrix_4d(2, 3, 0.0)
-
-    rotated = centers_4d @ R4d.T @ r1.T @ r2.T @ r3.T @ r4.T @ r5.T @ r6.T
-
-    return np.array([perspective_proj_4d_to_2d(c, d=d) for c in rotated])
-
-
 def prepare_trial(trial_idx):
     path = random.choice(PATHS)
 
@@ -115,9 +75,12 @@ def prepare_trial(trial_idx):
     right_centers = S_m if is_mirrored else S
 
     # pre-render frames for left and right
-    left_frames = [get_projected_centers_2d(S, t) for t in left_ts]
-    right_frames = [get_projected_centers_2d(
-        right_centers, t) for t in right_ts]
+    proj = TesseractOpenGL()
+
+    left_frames = [proj.get_projected_centers_2d(
+        S, t, d=10.0) for t in left_ts]
+    right_frames = [proj.get_projected_centers_2d(
+        right_centers, t, d=10.0) for t in right_ts]
 
     return {
         "trial": trial_idx,
