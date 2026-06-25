@@ -58,6 +58,42 @@ def depth_to_sizes(depth, d_min, d_max):
                      (MARKER_SIZE_MIN, MARKER_SIZE_MAX))
 
 
+def save_shape_image(pts, depth, path_str, deg, trial_idx, d_min, d_max):
+    fig_s, ax_s = plt.subplots(figsize=(5, 6))
+    ax_s.plot(pts[:, 0], pts[:, 1], '-', color='red', linewidth=2)
+    ax_s.scatter(pts[:, 0], pts[:, 1], color='black', zorder=3,
+                 s=depth_to_sizes(depth, d_min, d_max))
+
+    margin = 0.5
+    ax_s.set_xlim(pts[:, 0].min() - margin, pts[:, 0].max() + margin)
+    ax_s.set_ylim(pts[:, 1].min() - margin, pts[:, 1].max() + margin)
+    ax_s.set_aspect('equal')
+    ax_s.axis('off')
+
+    out_png = os.path.join(SAVE_DIR_IMG, f"{trial_idx}_{path_str}_{deg}.png")
+    fig_s.savefig(out_png, dpi=150, bbox_inches='tight')
+    plt.close(fig_s)
+
+
+def save_trial_images(trial_data):
+    """Save the left and right stimulus shapes for a trial as PNGs."""
+    left_frames = trial_data["left_frames"]
+    right_frames = trial_data["right_frames"]
+    left_depths = trial_data["left_depths"]
+    right_depths = trial_data["right_depths"]
+    trial_idx = trial_data["trial"]
+
+    # middle frame = representative view at the trial's center angle (deg1/deg2)
+    mid = len(left_frames) // 2
+    all_depths = np.concatenate(left_depths + right_depths)
+    d_min, d_max = all_depths.min(), all_depths.max()
+
+    save_shape_image(left_frames[mid], left_depths[mid], trial_data["path"],
+                     trial_data["deg1"], trial_idx, d_min, d_max)
+    save_shape_image(right_frames[mid], right_depths[mid], trial_data["path"],
+                     trial_data["deg2"], trial_idx, d_min, d_max)
+
+
 def prepare_trial(trial_idx):
     path = random.choice(PATHS)
 
@@ -287,6 +323,7 @@ def show_instant_feedback(trial_data, user_answer_is_mirror, is_correct):
 
 def run_gui_experiment(n_trials: int):
     os.makedirs(SAVE_DIR_CSV, exist_ok=True)
+    os.makedirs(SAVE_DIR_IMG, exist_ok=True)
     csv_path = CSV_PATH
 
     fields = [
@@ -318,6 +355,8 @@ def run_gui_experiment(n_trials: int):
             response_time_ms = int(round(rt * 1000)) if rt is not None else 0
 
             show_instant_feedback(trial, user_answer_is_mirror, is_correct)
+
+            save_trial_images(trial)
 
             writer.writerow({
                 "trial": trial["trial"],
