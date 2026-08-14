@@ -1,6 +1,7 @@
 _*
 exp-results/
 src/exp-result-analysis/**/*.csv
+web/
 
 # Virtual environment
 .venv/
