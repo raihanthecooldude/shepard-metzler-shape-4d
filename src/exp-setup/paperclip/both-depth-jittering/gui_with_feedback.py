@@ -40,6 +40,12 @@ T_VALUES = [
     10.667, 11.333, 12.000, 12.667, 13.333, 14.000, 14.667, 15.333, 16.000,
 ]
 
+MIN_ANGULAR_DISPARITY = 120
+
+def circular_deg_diff(deg1, deg2):
+    diff = abs(deg1 - deg2) % 360
+    return min(diff, 360 - diff)
+
 # ROTATE_DELTA_T = 9
 # ROTATE_N_FRAMES = 200
 # ROTATE_INTERVAL_MS = 75
@@ -54,7 +60,6 @@ MARKER_SIZE_MAX = 300
 
 
 def depth_to_sizes(depth, d_min, d_max):
-    """Map per-point depth (larger = nearer) to scatter marker areas."""
     if d_max <= d_min:
         return np.full_like(np.asarray(depth, dtype=float),
                             (MARKER_SIZE_MIN + MARKER_SIZE_MAX) / 2)
@@ -86,7 +91,6 @@ def save_trial_images(trial_data):
     right_depths = trial_data["right_depths"]
     trial_idx = trial_data["trial"]
 
-    # middle frame = representative view at the trial's center angle (deg1/deg2)
     mid = len(left_frames) // 2
     all_depths = np.concatenate(left_depths + right_depths)
     d_min, d_max = all_depths.min(), all_depths.max()
@@ -114,20 +118,20 @@ def prepare_trial(trial_idx):
     # S = S + np.array([0.5, 0.5, 0.5, 0.5])
     # S_m = S_m + np.array([0.5, 0.5, 0.5, 0.5])
 
-    # two distinct random angles
-    t1, t2 = random.sample(T_VALUES, k=2)
-    # t1, t2 = 0, 8
-    # t1 += 0.311
-    # t2 += 0.311
-    deg1, deg2 = t_to_deg_int(t1), t_to_deg_int(t2)
+    # two distinct random angles with a minimum circular disparity
+    while True:
+        t1, t2 = random.sample(T_VALUES, k=2)
+        deg1, deg2 = t_to_deg_int(t1), t_to_deg_int(t2)
+        if circular_deg_diff(deg1, deg2) >= MIN_ANGULAR_DISPARITY:
+            break
 
     is_mirrored = random.choice([0, 1])
 
     # jittering t values for animation
     left_ts = np.linspace(t1, t1, ROTATE_N_FRAMES)
-    right_ts = np.linspace(t2, t2, ROTATE_N_FRAMES)
-    # right_ts = np.linspace(t2 - ROTATE_DELTA_T, t2 +
-    #                        ROTATE_DELTA_T, ROTATE_N_FRAMES)
+    # right_ts = np.linspace(t2, t2, ROTATE_N_FRAMES)
+    right_ts = np.linspace(t2 - ROTATE_DELTA_T, t2 +
+                           ROTATE_DELTA_T, ROTATE_N_FRAMES)
 
     right_centers = S_m if is_mirrored else S
 
@@ -372,7 +376,7 @@ def run_gui_experiment(n_trials: int):
                 "path": trial["path"],
                 "deg1": trial["deg1"],
                 "deg2": trial["deg2"],
-                "delta_deg": abs(trial["deg2"] - trial["deg1"]),
+                "delta_deg": circular_deg_diff(trial["deg1"], trial["deg2"]),
                 "response_time_ms": response_time_ms,
                 "is_mirrored": trial["is_mirrored"],
                 "user_answer": int(user_answer_is_mirror),
