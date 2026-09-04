@@ -2,42 +2,41 @@ import os
 import random
 
 LENGTH = 12          # number of moves in each path
-N = 50               # how many paths to generate
+N = 20               # how many paths to generate
 # number of bends (axis-changes); 3 elbows -> 4 straight arms
 N_ELBOWS = 3
-MIN_ARM_LEN = 3      # minimum cubes per straight arm (so no 1-cube stubs)
+MIN_ARM_LEN = 3      # minimum cubes per straight arm
 SEED = 0             # for reproducible output, or None for fresh randomness
-OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "generated_paths.txt")
+OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "generated_paths_3d.txt")
 
 PREVIOUS_PATHS = [
 ]
 
+# 3D only: x/y/z moves (no 4th-dimension O/I)
 _AXIS_DELTA = {
-    "R": (+1, 0, 0, 0), "L": (-1, 0, 0, 0),
-    "U": (0, +1, 0, 0), "D": (0, -1, 0, 0),
-    "F": (0, 0, +1, 0), "B": (0, 0, -1, 0),
-    "O": (0, 0, 0, +1), "I": (0, 0, 0, -1),
+    "R": (+1, 0, 0), "L": (-1, 0, 0),
+    "U": (0, +1, 0), "D": (0, -1, 0),
+    "F": (0, 0, +1), "B": (0, 0, -1),
 }
-_OPPOSITE = {"R": "L", "L": "R", "U": "D", "D": "U",
-             "F": "B", "B": "F", "O": "I", "I": "O"}
-_AXIS_OF = {"R": "x", "L": "x", "U": "y", "D": "y",
-            "F": "z", "B": "z", "O": "w", "I": "w"}
+_OPPOSITE = {"R": "L", "L": "R", "U": "D", "D": "U", "F": "B", "B": "F"}
+_AXIS_OF = {"R": "x", "L": "x", "U": "y", "D": "y", "F": "z", "B": "z"}
 _ALL_MOVES = list(_AXIS_DELTA)
+_N_DIMS = 3
 
 
 def _build_one_path(length, rng, n_elbows, min_arm_len):
-    visited = {(0, 0, 0, 0)}
+    visited = {(0, 0, 0)}
     moves = []
     used_axes = set()
 
     def backtrack(pos, prev_move, elbows, run_len):
         if len(moves) == length:
             # the final arm must also be long enough
-            return (len(used_axes) == 4 and elbows == n_elbows
+            return (len(used_axes) == _N_DIMS and elbows == n_elbows
                     and run_len >= min_arm_len)
 
         remaining = length - len(moves)
-        missing = 4 - len(used_axes)
+        missing = _N_DIMS - len(used_axes)
         if remaining < missing:
             return False
         # prune: already turned too many times, or can't reach n_elbows in time
@@ -82,17 +81,20 @@ def _build_one_path(length, rng, n_elbows, min_arm_len):
                 used_axes.discard(_AXIS_OF[mv])
         return False
 
-    if backtrack((0, 0, 0, 0), None, 0, 0):
+    if backtrack((0, 0, 0), None, 0, 0):
         return "".join(moves)
     return None
 
 
 def generate_random_paths(previous_path, length, n, n_elbows=3, min_arm_len=1,
                           seed=None, max_attempts=100000):
-    if length < 4:
-        raise ValueError("length must be >= 4 to visit all 4 dimensions")
-    if n_elbows < 3:
-        raise ValueError("n_elbows must be >= 3 to visit all 4 dimensions")
+    if length < _N_DIMS:
+        raise ValueError(
+            f"length must be >= {_N_DIMS} to visit all 3 dimensions")
+    # visiting 3 dimensions needs at least 2 axis-changes
+    if n_elbows < _N_DIMS - 1:
+        raise ValueError(
+            f"n_elbows must be >= {_N_DIMS - 1} to visit all 3 dimensions")
     # n_elbows bends -> n_elbows + 1 arms, each at least min_arm_len long
     if length < (n_elbows + 1) * min_arm_len:
         raise ValueError(
@@ -121,7 +123,7 @@ def generate_random_paths(previous_path, length, n, n_elbows=3, min_arm_len=1,
 
 def write_paths_file(paths, output_file):
     with open(output_file, "w") as f:
-        f.write("PATHS_RANDOM = [\n")
+        f.write("PATHS_RANDOM_3D = [\n")
         for p in paths:
             f.write(f'    "{p}",\n')
         f.write("]\n")
