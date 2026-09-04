@@ -117,6 +117,7 @@ def prepare_trial(trial_idx):
 
     # jittering t values for animation (same as tesseract experiment)
     left_ts = np.linspace(t1, t1, ROTATE_N_FRAMES)
+    # right_ts = np.linspace(t2, t2, ROTATE_N_FRAMES)
     right_ts = np.linspace(t2 - ROTATE_DELTA_T, t2 +
                            ROTATE_DELTA_T, ROTATE_N_FRAMES)
 
