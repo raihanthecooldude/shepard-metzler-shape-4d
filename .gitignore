@@ -1,6 +1,7 @@
 _*
 exp-results/
 src/exp-result-analysis/**/*.csv
+src/exp-result-analysis/human-exp
 web/
 
 # Virtual environment
